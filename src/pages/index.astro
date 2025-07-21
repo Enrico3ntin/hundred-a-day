@@ -8,9 +8,60 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>100 a Day</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<h1>100 a Day</h1>
+		<div>
+			<div id="reps">0</div>
+			<div id="tracker">
+				<div id="tracked"></div>
+			</div>
+		</div>
+		<script>
+			(function () {
+				let fromHour = 5;
+				let fromMinute = 0
+				let toHour = 20;
+				let toMinute = 0;
+				let goal = 100;
+
+				let fromTime = fromHour * 60 + fromMinute;
+				let toTime = toHour * 60 + toMinute;
+				let lapse = (toTime - fromTime) / goal;
+
+				let now = new Date();
+				let currentTime = now.getHours() * 60 + now.getMinutes();
+				let reps = (currentTime - fromTime) / lapse;
+
+				let repsText = Math.min(Math.max(Math.ceil(reps), 0), goal);
+				let repsElement = document.querySelector("#reps");
+				repsElement?.setHTMLUnsafe(`${repsText}`);
+
+				let trackerElement = document.querySelector("#tracked");
+				trackerElement?.setAttribute('style', `width:${repsText}%`);
+
+			})()
+		</script>
 	</body>
 </html>
+
+<style>
+	body {
+		background-color: #27213a;
+		color: #0cc;
+	}
+	#reps {
+		font-size: 6rem;
+		color: #f0a;
+	}
+	#tracker {
+		height: 5px; 
+		background-color: #0cc2;
+	}
+	#tracked {
+		height: 100%;
+		width:70%; 
+		background-color:#0cc;
+	}
+</style>
