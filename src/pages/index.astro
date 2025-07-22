@@ -1,5 +1,5 @@
 ---
-
+import Dumbbell from "../components/dumbbell.astro"
 ---
 
 <html lang="en">
@@ -9,9 +9,13 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>100 a Day</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Bitcount:wght,CRSV@300,0&family=Exo+2&display=swap" rel="stylesheet">
 	</head>
 	<body onload="refresh()">
-		<h1>100 a Day</h1>
+		<h1><Dumbbell/> 100 a Day</h1>
 		<main>
 			<div id="reps">0</div>
 			<div id="tracker">
@@ -71,9 +75,15 @@
 </html>
 
 <style>
+	:root {
+		--background: 240 39% 15%;
+		--foreground: 157 88% 76%;
+		--accent: 319 100% 63%;
+	}
+
 	html {
-		background-color: #27213a;
-		color: #0cc;
+		background-color: hsl(var(--background));
+		color: hsl(var(--foreground));
 		margin: 0;
 		padding: 0;
 	}
@@ -81,6 +91,11 @@
 		max-width: 100ch;
 		margin: 0 auto;
 		padding: 0 1rem;
+
+		font-family: "Exo 2", sans-serif;
+		font-optical-sizing: auto;
+		font-weight: 400;
+		font-style: normal;
 	}
 	main {
 		display: flex;
@@ -89,18 +104,53 @@
 		justify-content: center;
 		gap: 3rem;
 	}
+	h1, #reps {
+		font-family: "Bitcount", system-ui;
+		font-optical-sizing: auto;
+		font-weight: 300;
+		font-style: normal;
+		font-variation-settings:
+			"slnt" 0,
+			"CRSV" 0,
+			"ELSH" 0,
+			"ELXP" 0;
+	}
+
 	#reps {
 		font-size: 6rem;
-		color: #f0a;
+		color: hsl(var(--accent));
 	}
 	#tracker {
 		height: .25rem;
-		background-color: #0cc2;
+		background: hsl(var(--foreground) / .15);
 		width: 100%;
 	}
 	#tracked {
 		height: 100%;
 		width: 0%; 
-		background-color:#0cc;
+		background-color: hsl(var(--foreground));
+	}
+
+	input {
+		border: solid 2px hsl(var(--foreground));
+		padding: 0.5rem 1rem;
+		font-size: 1rem;
+		border-radius: 1.25rem;
+		cursor: pointer;
+	}
+	input[type="submit"] {
+		background-color: hsl(var(--foreground));
+		color: hsl(var(--background));
+	}
+	input[type="number"] {
+		background-color: hsl(var(--background));
+		color: hsl(var(--foreground));
+	}
+	h1 {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: 2.25rem;
+		margin: 1rem 0;
 	}
 </style>
