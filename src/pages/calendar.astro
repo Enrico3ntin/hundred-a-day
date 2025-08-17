@@ -1,0 +1,9 @@
+---
+import CalendarComponent from '../components/calendar.astro';
+export const prerender = true;
+---
+
+<h1>Calendar Page</h1>
+<CalendarComponent server:defer>
+    <div slot="fallback">loading ...</div>
+</CalendarComponent>

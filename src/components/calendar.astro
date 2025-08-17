@@ -1,0 +1,57 @@
+---
+---
+<div class="calendar"></div>
+
+<style is:global>
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    padding: 1rem;
+    justify-items: center;
+    align-items: center;
+    align-content: middle;
+}
+.month {
+    grid-column: span 7;
+    font-weight: bold;
+    font-size: 1.5rem;
+    display: flex;
+    justify-self: stretch;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+</style>
+
+<script is:inline>
+
+    function calendar(date) {
+        const renderDay = (day, i) => {
+            return `<div${ i==0 ? ' style="grid-column-start:'+day.getDay()+'"' : '' }>${day.getDate()}</div>`;
+        };
+
+        let year = date.getFullYear();
+        let month = date.getMonth();
+        let daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        document.querySelector('.calendar').innerHTML = 
+            '<div class="month">' +
+                `<button onclick="calendar(new Date(${ year }, ${ month -1 }))">&lt;</button>` +
+                '<span>' + date.toLocaleString('default', { month: 'long', year: 'numeric' }) + '</span>' +
+                `<button onclick="calendar(new Date(${ year }, ${ month +1 }))">&gt;</button>` +
+            '</div>' +
+            '<div class="weekday">Mon</div>' +
+            '<div class="weekday">Tue</div>' +
+            '<div class="weekday">Wed</div>' +
+            '<div class="weekday">Thu</div>' +
+            '<div class="weekday">Fri</div>' +
+            '<div class="weekday">Sat</div>' +
+            '<div class="weekday">Sun</div>' +
+            new Array(daysInMonth).fill(null)
+            .map((_, i) => new Date(year,month, i+1))
+            .map(renderDay)
+            .join('');
+    }
+
+    calendar(new Date());
+</script>
