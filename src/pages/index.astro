@@ -1,5 +1,6 @@
 ---
-import Dumbbell from "../components/dumbbell.astro"
+import Dumbbell from "../components/dumbbell.astro";
+export const prerender = true;
 ---
 
 <html lang="en">
@@ -10,7 +11,7 @@ import Dumbbell from "../components/dumbbell.astro"
 		<meta name="generator" content={Astro.generator} />
 		<title>100 a Day</title>
 	</head>
-	<body onload="refresh()">
+	<body>
 		<header>
 			<h1><Dumbbell/> 100 a Day</h1>
 		</header>
@@ -85,6 +86,7 @@ import Dumbbell from "../components/dumbbell.astro"
 				event.target.logged.value = null;
 			});
 
+			refresh();
 			setInterval(refresh, 1000 * 60);
 		</script>
 	</body>
