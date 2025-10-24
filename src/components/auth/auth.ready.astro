@@ -1,0 +1,23 @@
+---
+import { app } from "../../firebase/server";
+import { getAuth } from "firebase-admin/auth";
+import SignedIn from './auth.signedin.astro';
+import SignedOut from './auth.signedout.astro';
+
+async function isAuthenticated() {
+    if (!Astro.cookies.has("__session")) {
+        return false;
+    }
+    const sessionCookie = Astro.cookies.get("__session")!.value;
+    const auth = getAuth(app);
+    const decodedCookie = await auth.verifySessionCookie(sessionCookie);
+    const user = await auth.getUser(decodedCookie.uid);
+    if (!user) {
+      return false;
+    }
+    return true;
+}
+
+---
+{ await isAuthenticated() ? <SignedIn/> : <SignedOut/> }
+
