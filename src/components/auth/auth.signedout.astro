@@ -1,0 +1,39 @@
+---
+---
+<button id="signinbutton" title="sign in">🫥</button>
+<script>
+  import { getAuth, inMemoryPersistence, signInAnonymously} from "firebase/auth";
+  import { app } from "../../firebase/client";
+
+  let button = document.getElementById('signinbutton');
+  button?.addEventListener('click', async () => {
+    button.innerHTML = '⏳';
+    button.setAttribute('disabled', 'true');
+
+    const auth = getAuth(app);
+    auth.setPersistence(inMemoryPersistence);
+
+    const userCredential = await signInAnonymously(auth);
+    const idToken = await userCredential.user.getIdToken();
+    fetch("/api/auth/signin", {
+      method: "GET",
+      headers: {Authorization: `Bearer ${idToken}` },
+    }).then((response) => {
+      if (response.status === 200) {
+        window.location.reload();
+      } else {
+        button.innerHTML = '😵';
+        button.setAttribute('disabled', 'false');
+      }
+    });
+  });
+</script>
+<style>
+    button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+</style>
