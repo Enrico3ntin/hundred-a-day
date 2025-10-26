@@ -1,7 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { GoogleAuthProvider } from "firebase/auth";
+import { initializeApp, type FirebaseApp } from "firebase/app";
+import { GoogleAuthProvider, type Auth } from "firebase/auth";
 import { atom, onMount } from "nanostores";
-import { getAuth, signInAnonymously, signInWithPopup, signOut} from "firebase/auth";
+import { getAuth, signInAnonymously, signInWithPopup, signOut, linkWithCredential} from "firebase/auth";
 
 
 const firebaseConfig = {
@@ -14,9 +14,23 @@ const firebaseConfig = {
   measurementId: "G-71FLRLHQJX"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleAuthProvider = new GoogleAuthProvider();
+const $firebaseApp = atom<FirebaseApp | undefined>();
+onMount($firebaseApp, () => {
+    console.log("Lazily initializing Firebase App");
+    $firebaseApp.set(initializeApp(firebaseConfig));
+});
+
+const $firebaseAuth = atom<Auth | undefined>();
+onMount($firebaseAuth, () => {
+    console.log("Lazily initializing Firebase Auth");
+    $firebaseAuth.set(getAuth($firebaseApp.get()));
+});
+
+const $googleAuthProvider = atom<GoogleAuthProvider | undefined>();
+onMount($googleAuthProvider, () => {
+    console.log("Lazily initializing Google Auth Provider");
+    $googleAuthProvider.set(new GoogleAuthProvider());
+});
 
 type Authentication = 
     { status: 'NONE' | 'LOADING' } |
@@ -24,7 +38,6 @@ type Authentication =
     { status: 'ERROR', errorMessage: string };
 export const $authentication = 
     atom<Authentication>({ status: 'NONE' });
-
 onMount($authentication, () => {
     if ( $authentication.get().status == 'NONE' ) {
         signInWithoutAccount();
@@ -34,7 +47,7 @@ onMount($authentication, () => {
 export const signInWithoutAccount = 
     () => { 
         $authentication.set({ status: 'LOADING' });
-        signInAnonymously(auth)
+        signInAnonymously($firebaseAuth.get()!)
         .then((userCredentials) => {
             $authentication.set({ 
                 status: 'ANONYMOUS', 
@@ -49,7 +62,7 @@ export const signInWithoutAccount =
 export const signInWithGoogle = 
     () => { 
         $authentication.set({ status: 'LOADING' });
-        signInWithPopup(auth, googleAuthProvider)
+        signInWithPopup($firebaseAuth.get()!, $googleAuthProvider.get()!)
         .then((userCredentials) => {
             $authentication.set({ 
                 status: 'AUTHENTICATED', 
@@ -65,6 +78,6 @@ export const signInWithGoogle =
 export const signOutOfAccount = 
     async () => { 
         $authentication.set({ status: 'LOADING' });
-        await signOut(auth);
+        await signOut($firebaseAuth.get()!);
         signInWithoutAccount();
     };
