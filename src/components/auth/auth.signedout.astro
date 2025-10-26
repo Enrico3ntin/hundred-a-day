@@ -1,30 +1,60 @@
 ---
 ---
-<button id="signinbutton" title="sign in">🫥</button>
+<button id="signinbutton" title="sign in" disabled>⏳</button>
 <script>
-  import { getAuth, inMemoryPersistence, signInAnonymously} from "firebase/auth";
-  import { app } from "../../firebase/client";
+  import { getAuth, inMemoryPersistence, signInAnonymously, signInWithPopup} from "firebase/auth";
+  import { app, googleAuthProvider } from "../../firebase/client";
 
-  let button = document.getElementById('signinbutton');
-  button?.addEventListener('click', async () => {
-    button.innerHTML = '⏳';
-    button.setAttribute('disabled', 'true');
+  const BUTTON = {
+    element: document.getElementById('signinbutton'),
+    display: (text:string, disabled:boolean)=> {
+      BUTTON.element!.innerHTML = text;
+      if (disabled) {
+        BUTTON.element?.setAttribute('disabled', 'true');
+      } else { 
+        BUTTON.element?.removeAttribute('disabled');
+      }
+    },
+    displayAnonymous: ()=> BUTTON.display('🫥', false),
+    displayError: ()=> BUTTON.display('😵', false),
+    displayLoading: ()=> BUTTON.display('⏳', true),
+  };
 
-    const auth = getAuth(app);
-    auth.setPersistence(inMemoryPersistence);
+  const signin : (idToken:string, callback:()=>void) => void =
+    async (idToken, callback) => {
+      const response = await fetch("/api/auth/signin", {
+        method: "GET",
+        headers: {Authorization: `Bearer ${idToken}` },
+      })
+      if (response.status === 200) {
+        callback();
+      } else {
+        BUTTON.displayError();
+      }
+    };
 
+  const auth = getAuth(app);
+  auth.setPersistence(inMemoryPersistence);
+
+  const hasSessionCookie = (`; ${document.cookie}`.indexOf('; __session=') >= 0);
+  if (!hasSessionCookie) {
     const userCredential = await signInAnonymously(auth);
     const idToken = await userCredential.user.getIdToken();
-    fetch("/api/auth/signin", {
-      method: "GET",
-      headers: {Authorization: `Bearer ${idToken}` },
-    }).then((response) => {
-      if (response.status === 200) {
-        window.location.reload();
-      } else {
-        button.innerHTML = '😵';
-        button.setAttribute('disabled', 'false');
-      }
+    signin(idToken, BUTTON.displayAnonymous);
+  } else {
+    BUTTON.displayAnonymous();
+  }
+
+  BUTTON.element?.addEventListener('click', async () => {
+    BUTTON.displayLoading();
+
+    signInWithPopup(auth, googleAuthProvider)
+    .then(async (userCredential) => signin(
+        await userCredential.user.getIdToken(), 
+        () => window.location.reload()))
+    .catch((error) => {
+      console.error("Error during sign-in with popup:", error);
+      BUTTON.displayError();
     });
   });
 </script>
