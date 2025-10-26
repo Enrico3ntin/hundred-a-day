@@ -1,0 +1,43 @@
+---
+---
+<button id="authentication" title="loading..." disabled>⏳</button>
+<script>
+    import { $authentication, signInWithGoogle, signOutOfAccount } from "../store/authentication";
+
+    const button = document.getElementById('authentication');
+    $authentication.subscribe((auth) => {
+        switch (auth.status) {
+            case 'ANONYMOUS':
+                button!.innerHTML = '🫥';
+                button!.removeAttribute('disabled');
+                button!.setAttribute('title', `signed in anonymously as ${auth.uid}`);
+                button!.onclick = signInWithGoogle;
+                break;
+            case 'AUTHENTICATED':
+                button!.innerHTML = '😀';
+                button!.removeAttribute('disabled');
+                button!.setAttribute('title', `signed in as ${auth.uid}`);
+                button!.onclick = signOutOfAccount;
+                break;
+            case 'ERROR':
+                button!.innerHTML = '😵';
+                button!.removeAttribute('disabled');
+                button!.setAttribute('title', auth.errorMessage);
+                break;
+            default:
+                button!.innerHTML = '⏳';
+                button!.setAttribute('disabled', 'true');
+                button!.setAttribute('title', 'loading...');
+                break;
+        }
+    });
+</script>
+<style>
+    button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+</style>
