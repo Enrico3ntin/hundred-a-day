@@ -16,19 +16,16 @@ const firebaseConfig = {
 
 const $firebaseApp = atom<FirebaseApp | undefined>();
 onMount($firebaseApp, () => {
-    console.log("Lazily initializing Firebase App");
     $firebaseApp.set(initializeApp(firebaseConfig));
 });
 
 const $firebaseAuth = atom<Auth | undefined>();
 onMount($firebaseAuth, () => {
-    console.log("Lazily initializing Firebase Auth");
     $firebaseAuth.set(getAuth($firebaseApp.get()));
 });
 
 const $googleAuthProvider = atom<GoogleAuthProvider | undefined>();
 onMount($googleAuthProvider, () => {
-    console.log("Lazily initializing Google Auth Provider");
     $googleAuthProvider.set(new GoogleAuthProvider());
 });
 
