@@ -1,4 +1,5 @@
 import { atom, computed, onMount, onSet, task } from "nanostores";
+import { persist } from './persistency';
 
 const REFRESH_RATE = 4 * 1000;
 const minMax : (value: number, min: number, max: number) => number =
@@ -45,19 +46,20 @@ const $history = atom<{ lastUpdated:Date, repCount:number}>({
 });
 onMount($history, () => {
     task(async () => {
-        console.log('retrieving history ...');
         const saved = await localStorage.getItem('100aDay');
-        if (!saved) { console.log('no history saved'); return; }
+        if (!saved) { return; }
         const { lastUpdated, repCount } = JSON.parse(saved);
-        if (!lastUpdated) { console.log('no lastUpdated'); return; };
-        if ( repCount == undefined || repCount == null ) { console.log('no repCount'); return; }
+        if (!lastUpdated) { return; };
+        if ( repCount == undefined || repCount == null ) { return; }
         
         $history.set({ lastUpdated: new Date(lastUpdated) , repCount });
-        console.log('done');
     });
 });
 onSet($history, ({ newValue }) => {
-    console.log(`setting $history:${JSON.stringify(newValue)}`);
+    if ($history.get()?.lastUpdated == newValue.lastUpdated) {
+        return;
+    }
+    persist(newValue.lastUpdated, newValue.repCount);
     localStorage.setItem('100aDay', JSON.stringify(newValue));
 });
 
@@ -79,7 +81,6 @@ export const logReps = (reps:number) => {
     const now = new Date();
     const { lastUpdated, repCount } = $history.get();
     const newRepCount = isSameDate(lastUpdated, now) ? reps + repCount : reps;
-    console.log(`logReps[reps:${reps} + repCount:${repCount}] newRepCount = ${newRepCount}`);
     $history.set({ 
         lastUpdated: now, 
         repCount: newRepCount
