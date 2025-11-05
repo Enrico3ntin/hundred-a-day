@@ -1,5 +1,6 @@
 ---
 import Header from "../components/header.astro";
+import Countdown from "../components/countdown.astro";
 ---
 
 <html lang="en">
@@ -12,84 +13,30 @@ import Header from "../components/header.astro";
 	</head>
 	<body>
 		<Header />
+		<Countdown />
 
-		<div id="target">
-			<div class="pre-value">Time for</div>
-			<div class="value">0</div>
-			<div class="post-value">push-ups</div>
-		</div>
-
-		<div id="progress">
-			<div class="pre-value">loading...</div>
-			<div class="value"><div></div></div>
-			<div class="post-value">60/100</div>
-		</div>
-
-		<form>
-			<input type="number" name="logged" />
+		<form id="logRepsForm">
+			<input id="logRepsField" type="number" />
 			<input type="submit" value="Log" />
 		</form>
 
-		<script is:inline>
-			const config = {
-				from : { hour: 5, minute: 0 },
-				to : { hour: 20, minute: 0 },
-				goal: 100
-			};
-
-			const units = {
-				from: config.from.hour * 60 + config.from.minute,
-				to: config.to.hour * 60 + config.to.minute,
-			};
-			units.minutesPerUnit = (units.to - units.from) / config.goal;
-
-			const limit = (n) => Math.min(Math.max(n, 0), config.goal);
-
-			async function refresh(logged=0) {
-				let now = new Date();
-				let today = new Date().toLocaleDateString();
-				let projected = limit(Math.ceil((now.getHours() * 60 + now.getMinutes() - units.from) / units.minutesPerUnit));
-				let completed = logged*1;
-
-				let logs = JSON.parse(await localStorage.getItem('100aDay'));
-				if (logs && logs.lastUpdated === today) {
-					completed += logs.completed*1;
-				}
-
-				localStorage.setItem('100aDay', JSON.stringify({
-					lastUpdated: today,
-					completed: completed
-				}));
-
-				document
-					.querySelector("#target > .value")
-					.setHTMLUnsafe(`${limit(projected-completed)}`);
-				document
-					.querySelector("#progress > .pre-value")
-					.setHTMLUnsafe(completed < config.goal ?
-						`${limit(config.goal-completed)} push-ups to go` :
-						`You did it! 🎉 ${completed} push-ups today!`);
-				document
-					.querySelector("#progress > .value > div")
-					.setAttribute('style', `width:${limit(100*completed/config.goal)}%`);
-				document
-					.querySelector("#progress > .post-value")
-					.setHTMLUnsafe(`${completed}/${config.goal}`);
-			}
-
-			document.querySelector("form")?.addEventListener("submit", async (event) => {
+		<script>
+			import { logReps } from '../store/countdown';
+			const logRepsField = document.getElementById('logRepsField') as HTMLInputElement;
+			const logRepsForm = document.getElementById('logRepsForm');
+			logRepsForm!.onsubmit = (event) => {
 				event.preventDefault();
-				refresh(parseInt(event.target.logged.value || "0"));
-				event.target.logged.value = null;
-			});
-
-			refresh();
-			setInterval(refresh, 1000 * 60);
+				const value = logRepsField.value;
+				if (value) {
+					logReps(parseInt(value));
+					logRepsField.value = '';
+				}
+			}
 		</script>
 	</body>
 </html>
 
-<style>
+<style is:global>
 	@import url('https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght,CRSV@300,0&family=Exo+2&display=swap');
 
 	:root {
@@ -121,57 +68,6 @@ import Header from "../components/header.astro";
 		flex-direction: column;
 		align-items: center;
 		justify-content: space-between;
-	}
-
-	#target > .value {
-		font-family: "Bitcount Prop Single", system-ui;
-		font-optical-sizing: auto;
-		font-weight: 300;
-		font-style: normal;
-		font-variation-settings:
-			"slnt" 0,
-			"CRSV" 0,
-			"ELSH" 0,
-			"ELXP" 0;
-	}
-
-	#target {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		text-align: center;
-	}
-
-	#target > .value {
-		height: 8rem;
-		color: hsl(var(--accent));
-		font-size: 12rem;
-		line-height: 9.5rem;
-		padding-left: 2.5rem;
-		text-align: center;
-		letter-spacing: -1rem;
-	}
-
-	#progress {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	#progress > .value {
-		height: .5rem;
-		width: 100%;
-		background: hsl(var(--foreground) / .15);
-		border: solid 1px hsl(var(--foreground) / .25);
-		border-radius: .25rem;
-	}
-
-	#progress > .value > div {
-		height: 100%;
-		width: 0%; 
-		background-color: hsl(var(--foreground));
 	}
 
 	form {
