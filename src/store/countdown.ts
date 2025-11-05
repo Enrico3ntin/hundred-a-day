@@ -1,5 +1,5 @@
-import { atom, computed, onMount, onSet, task } from "nanostores";
-import { persist } from './persistency';
+import { atom, computed, onMount, task } from "nanostores";
+import { read, persist } from './persistency';
 
 const REFRESH_RATE = 4 * 1000;
 const minMax : (value: number, min: number, max: number) => number =
@@ -40,49 +40,41 @@ const $projection = computed([$units, $currentTime], ( { startTimeInMinutes, min
     return Math.ceil((currentTime - startTimeInMinutes) / minutesPerUnit);
 });
 
-const $history = atom<{ lastUpdated:Date, repCount:number}>({
-    lastUpdated: new Date(),
-    repCount: 0
-});
+const $history = atom<{ lastUpdated:Date, repCount:number } | undefined>();
 onMount($history, () => {
-    task(async () => {
-        const saved = await localStorage.getItem('100aDay');
-        if (!saved) { return; }
-        const { lastUpdated, repCount } = JSON.parse(saved);
-        if (!lastUpdated) { return; };
-        if ( repCount == undefined || repCount == null ) { return; }
-        
-        $history.set({ lastUpdated: new Date(lastUpdated) , repCount });
-    });
-});
-onSet($history, ({ newValue }) => {
-    if ($history.get()?.lastUpdated == newValue.lastUpdated) {
-        return;
-    }
-    persist(newValue.lastUpdated, newValue.repCount);
-    localStorage.setItem('100aDay', JSON.stringify(newValue));
+    task(async () => 
+        read((snapshot)=>{
+            let lastUpdated = 0;
+            let totalCount = 0;
+            snapshot.forEach((entry) => {
+                const { timestamp, repCount } = entry.val();
+                lastUpdated = Math.max(lastUpdated, timestamp);
+                totalCount += repCount;
+            });
+            $history.set({ 
+                    lastUpdated: new Date(lastUpdated) , 
+                    repCount: totalCount });
+        })
+    );
 });
 
-const $target = computed([$projection, $history, $config], (projection, { lastUpdated, repCount }, { goal }) => {
+const $target = computed([$projection, $history, $config], (projection, history, { goal }) => {
+    if (!history) return;
     const now = new Date();
-    if (!isSameDate(now, lastUpdated)) {
+    if (!isSameDate(now, history.lastUpdated)) {
         $history.set({ lastUpdated: now, repCount: 0 });
     }
-    return minMax(minMax(projection, 0, goal) - repCount, 0, goal);
+    return minMax(minMax(projection, 0, goal) - history.repCount, 0, goal);
 });
 
-export const $countdown = computed([$config, $history, $target], ({ goal }, { repCount }, target) => {
+export const $countdown = computed([$config, $history, $target], ({ goal }, history, target) => {
+    if (!history) return { goal, target };
+    const { repCount } = history;
     const remaining = minMax(goal - repCount, 0, goal);
     const percentage = minMax(100* repCount / goal, 0, 100);
     return { goal, repCount, target, remaining, percentage };
 });
 
 export const logReps = (reps:number) => {
-    const now = new Date();
-    const { lastUpdated, repCount } = $history.get();
-    const newRepCount = isSameDate(lastUpdated, now) ? reps + repCount : reps;
-    $history.set({ 
-        lastUpdated: now, 
-        repCount: newRepCount
-    });
+    persist(new Date(), reps);
 };

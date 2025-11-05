@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, type Auth } from "firebase/auth";
-import { allTasks, atom, computed, onMount, task } from "nanostores";
+import { atom, computed, onMount, task } from "nanostores";
 import { getAuth, signInAnonymously, signInWithPopup, signOut } from "firebase/auth";
 import { $firebaseApp } from "./firebase";
 
@@ -25,11 +25,8 @@ onMount($authentication, () => {
     }
 });
 
-export const $uid = computed($firebaseAuth, 
-    async (auth)=>{
-        await allTasks(); 
-        return auth?.currentUser?.uid;
-    });
+export const $uid = computed([$firebaseAuth, $authentication], 
+    (auth)=> auth?.currentUser?.uid );
 
 export const signInWithoutAccount = 
     () => { 

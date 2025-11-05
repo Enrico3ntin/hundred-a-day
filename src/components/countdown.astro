@@ -2,7 +2,7 @@
 ---
 <div id="target">
     <div class="pre-value">Time for</div>
-    <div class="value">0</div>
+    <div class="value">#</div>
     <div class="post-value">push-ups</div>
 </div>
 
@@ -21,11 +21,11 @@
     const progressBar = document.querySelector("#progress > .value > div");
 
     $countdown.subscribe(({ goal, repCount, target, remaining, percentage }) => {
-        timeForReps?.setHTMLUnsafe(`${target}`);
-        todo?.setHTMLUnsafe(repCount < goal ?
+        timeForReps?.setHTMLUnsafe(`${target == undefined ? '#' : target }`);
+        todo?.setHTMLUnsafe((repCount != undefined && repCount < goal) ?
             `${remaining} push-ups to go` :
             `You did it! 🎉 ${repCount} push-ups today!`);
-        completed?.setHTMLUnsafe(`${repCount}/${goal}`);
+        completed?.setHTMLUnsafe(`${repCount == undefined ? '?' : repCount}/${goal}`);
         progressBar?.setAttribute('style', `width:${percentage}%`);
     });
 </script>
