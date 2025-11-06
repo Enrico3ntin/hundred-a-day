@@ -41,6 +41,13 @@ export const read : (callback:(snapshot:DataSnapshot)=>void) => Unsubscribe | un
 
 export const persist : (timestamp:Date, repCount:number)=>void =
     (timestamp, repCount) => {
+        const currentTimeRef = $currentTimeRef.get();
+        if ( currentTimeRef.level != 'day'
+            || currentTimeRef.timestamp.getDate() != timestamp.getDate()
+            || currentTimeRef.timestamp.getMonth() != timestamp.getMonth()
+            || currentTimeRef.timestamp.getFullYear() != timestamp.getFullYear()) {
+                $currentTimeRef.set({ timestamp:timestamp, level:'day' });
+        }
         const reference = $databaseRef.get();
         const session = { timestamp:timestamp.getTime(), repCount:repCount };
         if (reference) push(reference, session);
