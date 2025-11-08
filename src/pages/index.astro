@@ -21,14 +21,14 @@ import Countdown from "../components/countdown.astro";
 		</form>
 
 		<script>
-			import { logReps } from '../store/countdown';
+			import { logSession } from '../store/countdown';
 			const logRepsField = document.getElementById('logRepsField') as HTMLInputElement;
 			const logRepsForm = document.getElementById('logRepsForm');
 			logRepsForm!.onsubmit = (event) => {
 				event.preventDefault();
 				const value = logRepsField.value;
 				if (value) {
-					logReps(parseInt(value));
+					logSession(parseInt(value));
 					logRepsField.value = '';
 				}
 			}

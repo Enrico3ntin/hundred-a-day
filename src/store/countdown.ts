@@ -1,5 +1,5 @@
 import { atom, computed, onMount, task } from "nanostores";
-import { read, persist } from './persistency';
+import { subscribe, persistSession } from './persistency';
 
 const REFRESH_RATE = 4 * 1000;
 const minMax : (value: number, min: number, max: number) => number =
@@ -43,7 +43,7 @@ const $projection = computed([$units, $currentTime], ( { startTimeInMinutes, min
 const $history = atom<{ lastUpdated:Date, repCount:number } | undefined>();
 onMount($history, () => {
     task(async () => 
-        read((snapshot)=>{
+        subscribe((snapshot)=>{
             let lastUpdated = 0;
             let totalCount = 0;
             snapshot.forEach((entry) => {
@@ -67,7 +67,7 @@ const $target = computed([$projection, $history, $config], (projection, history,
     return minMax(minMax(projection, 0, goal) - history.repCount, 0, goal);
 });
 
-export const $countdown = computed([$config, $history, $target], ({ goal }, history, target) => {
+const $countdown = computed([$config, $history, $target], ({ goal }, history, target) => {
     if (!history) return { goal, target };
     const { repCount } = history;
     const remaining = minMax(goal - repCount, 0, goal);
@@ -75,6 +75,8 @@ export const $countdown = computed([$config, $history, $target], ({ goal }, hist
     return { goal, repCount, target, remaining, percentage };
 });
 
-export const logReps = (reps:number) => {
-    persist(new Date(), reps);
+const logSession = (reps:number) => {
+    persistSession(new Date(), reps);
 };
+
+export { $countdown, logSession };

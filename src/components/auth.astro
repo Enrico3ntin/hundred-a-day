@@ -2,7 +2,7 @@
 ---
 <button id="authentication" title="loading..." disabled>⏳</button>
 <script>
-    import { $authentication, signInWithGoogle, signOutOfAccount } from "../store/authentication";
+    import { $authentication, signInWithGoogle, signOut } from "../store/authentication";
 
     const button = document.getElementById('authentication');
     $authentication.subscribe((auth) => {
@@ -17,7 +17,7 @@
                 button!.innerHTML = '😀';
                 button!.removeAttribute('disabled');
                 button!.setAttribute('title', `signed in as ${auth.uid}`);
-                button!.onclick = signOutOfAccount;
+                button!.onclick = signOut;
                 break;
             case 'ERROR':
                 button!.innerHTML = '😵';
