@@ -9,6 +9,14 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+      FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+      FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+      FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+      FIREBASE_MEASUREMENT_ID: ${{ vars.FIREBASE_MEASUREMENT_ID }}
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
@@ -21,10 +29,3 @@ jobs:
           projectId: hundredaday-3nsn
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
-          FIREBASE_API_KEY: ${{ env.FIREBASE_API_KEY }}
-          FIREBASE_AUTH_DOMAIN: ${{ env.FIREBASE_AUTH_DOMAIN }}
-          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID }}
-          FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_STORAGE_BUCKET }}
-          FIREBASE_MESSAGING_SENDER_ID: ${{ env.FIREBASE_MESSAGING_SENDER_ID }}
-          FIREBASE_APP_ID: ${{ env.FIREBASE_APP_ID }}
-          FIREBASE_MEASUREMENT_ID: ${{ env.FIREBASE_MEASUREMENT_ID }}
