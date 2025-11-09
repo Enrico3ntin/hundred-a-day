@@ -2,31 +2,32 @@
 ---
 <div id="target">
     <div class="pre-value">Time for</div>
-    <div class="value">#</div>
+    <div class="value">?</div>
     <div class="post-value">push-ups</div>
 </div>
 
 <div id="progress">
-    <div class="pre-value">loading...</div>
+    <div class="pre-value">??? push-ups to go</div>
     <div class="value"><div></div></div>
-    <div class="post-value">60/100</div>
+    <div class="post-value">??/???</div>
 </div>
 
 <script>
-    import { $countdown } from '../store/countdown.ts';
+	import { $countdown } from '../store/countdown.ts';
 
-    const timeForReps = document.querySelector("#target > .value");
-    const todo = document.querySelector("#progress > .pre-value");
-    const completed = document.querySelector("#progress > .post-value")
-    const progressBar = document.querySelector("#progress > .value > div");
+    const timeForReps = document.querySelector("#target > .value")!;
+    const todo = document.querySelector("#progress > .pre-value")!;
+    const completed = document.querySelector("#progress > .post-value")!;
+    const progressBar = document.querySelector("#progress > .value > div")!;
 
     $countdown.subscribe(({ goal, repCount, target, remaining, percentage }) => {
-        timeForReps?.setHTMLUnsafe(`${target == undefined ? '#' : target }`);
-        todo?.setHTMLUnsafe((repCount != undefined && repCount < goal) ?
-            `${remaining} push-ups to go` :
-            `You did it! 🎉 ${repCount} push-ups today!`);
-        completed?.setHTMLUnsafe(`${repCount == undefined ? '?' : repCount}/${goal}`);
-        progressBar?.setAttribute('style', `width:${percentage}%`);
+		if (target == undefined || repCount == undefined || remaining == undefined) return;
+		timeForReps.setHTMLUnsafe(`${target}`);
+		todo.setHTMLUnsafe((repCount < goal) ?
+			`${remaining} push-ups to go` :
+			`You did it! 🎉 ${repCount} push-ups today!`);
+        completed.setHTMLUnsafe(`${repCount}/${goal}`);
+        progressBar.setAttribute('style', `width:${percentage}%`);
     });
 </script>
 
