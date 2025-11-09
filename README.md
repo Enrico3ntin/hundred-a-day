@@ -1,4 +1,4 @@
-# Astro Starter Kit: Minimal
+# Hundred a day
 
 ```sh
 npm create astro@latest -- --template minimal
