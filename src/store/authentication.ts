@@ -5,7 +5,8 @@ import { $firebaseApp } from "./firebase";
 
 type Authentication = 
     { status: 'NONE' | 'LOADING' } |
-    { status: 'ANONYMOUS' | 'AUTHENTICATED', uid: string } |
+    { status: 'ANONYMOUS', uid: string } |
+    { status: 'AUTHENTICATED', uid: string, email: string } |
     { status: 'ERROR', errorMessage: string };
 
 const $firebaseAuth = atom<Auth | undefined>();
@@ -47,7 +48,8 @@ const signInWithGoogle = () => {
             const userCredentials = await signInWithPopup(auth!, provider!);
             $authentication.set({ 
                 status: 'AUTHENTICATED', 
-                uid: userCredentials.user.uid } );
+                uid: userCredentials.user.uid,
+                email: userCredentials.user.email! } );
         } catch (error) {
             $authentication.set({ 
                 status: 'ERROR', 
