@@ -3,11 +3,20 @@
 <div id="loading-group" class="dropdown">
     <button class="dropdown-trigger" title="loading..." disabled>⏳</button>
 </div>
-<div id="anonymous-group" class="dropdown" hidden>
-    <button class="dropdown-trigger" title="anonymous user">🫥</button>
+<div id="unauthenticated-group" class="dropdown" hidden>
+    <button class="dropdown-trigger" title="unauthenticated user">🫥</button>
     <div class="dropdown-panel">
         <div>User not authenticated.</div>
+        <button class="auth-button" id="sign-in-anonymously">Sign in anonymously</button>
+        <button class="auth-button" id="sign-in-anonymously-with-google">Sign in with Google</button>
+    </div>
+</div>
+<div id="anonymous-group" class="dropdown" hidden>
+    <button class="dropdown-trigger" title="anonymous user">😎</button>
+    <div class="dropdown-panel">
+        <div>User authenticated anonymously</div>
         <button class="auth-button" id="sign-in-with-google">Sign in with Google</button>
+        <button class="auth-button" id="sign-out-anonymously">Sign out</button>
     </div>
 </div>
 <div id="authenticated-group" class="dropdown" hidden>
@@ -24,9 +33,10 @@
     </div>
 </div>
 <script>
-    import { $authentication, signInWithGoogle, signOut } from "../store/authentication";
+    import { $authentication, signInWithGoogle, signInWithoutAccount, signOut } from "../store/authentication";
 
     const loadingGroup = document.getElementById('loading-group');
+    const unauthenticatedGroup = document.getElementById('unauthenticated-group');
     const anonymousGroup = document.getElementById('anonymous-group');
     const authenticatedGroup = document.getElementById('authenticated-group');
     const errorGroup = document.getElementById('error-group');
@@ -34,14 +44,25 @@
     const emailField = document.getElementById('user-email');
 
     document.getElementById('sign-in-with-google')!.onclick = signInWithGoogle;
+    document.getElementById('sign-in-anonymously')!.onclick = signInWithoutAccount;
+    document.getElementById('sign-in-anonymously-with-google')!.onclick = signInWithGoogle;
+    document.getElementById('sign-out-anonymously')!.onclick = signOut;
     document.getElementById('sign-out')!.onclick = signOut;
     
     $authentication.subscribe((auth) => {
         switch (auth?.status) {
+            case 'NONE':
+                loadingGroup?.setAttribute('hidden', 'true');
+                anonymousGroup?.setAttribute('hidden', 'true');
+                authenticatedGroup?.setAttribute('hidden', 'true');
+                unauthenticatedGroup?.removeAttribute('hidden');
+                errorGroup?.setAttribute('hidden', 'true');
+                break;
             case 'ANONYMOUS':
                 loadingGroup?.setAttribute('hidden', 'true');
                 anonymousGroup?.removeAttribute('hidden');
                 authenticatedGroup?.setAttribute('hidden', 'true');
+                unauthenticatedGroup?.setAttribute('hidden', 'true');
                 errorGroup?.setAttribute('hidden', 'true');
                 break;
             case 'AUTHENTICATED':
@@ -49,6 +70,7 @@
                 loadingGroup?.setAttribute('hidden', 'true');
                 anonymousGroup?.setAttribute('hidden', 'true');
                 authenticatedGroup?.removeAttribute('hidden');
+                unauthenticatedGroup?.setAttribute('hidden', 'true');
                 errorGroup?.setAttribute('hidden', 'true');
                 break;
             case 'ERROR':
@@ -56,12 +78,14 @@
                 loadingGroup?.setAttribute('hidden', 'true');
                 anonymousGroup?.setAttribute('hidden', 'true');
                 authenticatedGroup?.setAttribute('hidden', 'true');
+                unauthenticatedGroup?.setAttribute('hidden', 'true');
                 errorGroup?.removeAttribute('hidden');
                 break;
             default:
                 loadingGroup?.removeAttribute('hidden');
                 anonymousGroup?.setAttribute('hidden', 'true');
                 authenticatedGroup?.setAttribute('hidden', 'true');
+                unauthenticatedGroup?.setAttribute('hidden', 'true');
                 errorGroup?.setAttribute('hidden', 'true');
                 break;
         }
