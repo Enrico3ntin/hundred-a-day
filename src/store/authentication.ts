@@ -17,7 +17,7 @@ onMount($authentication, () => {
     const auth = getAuth($firebaseApp.get());
     onAuthStateChanged(auth, currentUser => {
         if ( !currentUser ) {
-            $authentication.set({ status: 'NONE' });
+            signInWithoutAccount();
         } else if ( currentUser.isAnonymous ) {
             $authentication.set({ status: 'ANONYMOUS', uid: currentUser.uid })
         } else {
