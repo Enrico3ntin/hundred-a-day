@@ -1,43 +1,121 @@
 ---
 ---
-<button id="authentication" title="loading..." disabled>⏳</button>
+<div id="loading-group" class="dropdown">
+    <button class="dropdown-trigger" title="loading..." disabled>⏳</button>
+</div>
+<div id="anonymous-group" class="dropdown" hidden>
+    <button class="dropdown-trigger" title="anonymous user">🫥</button>
+    <div class="dropdown-panel">
+        <div>User authenticated anonymously</div>
+        <button class="auth-button" id="sign-in-with-google">Sign in with Google</button>
+    </div>
+</div>
+<div id="authenticated-group" class="dropdown" hidden>
+    <button class="dropdown-trigger" title="authenticated user">😀</button>
+    <div class="dropdown-panel">
+        <div>Signed in as <span id="user-email"></span></div>
+        <button class="auth-button" id="sign-out">Sign out</button>
+    </div>
+</div>
+<div id="error-group" class="dropdown" hidden>
+    <button class="dropdown-trigger" title="error">😵</button>
+    <div class="dropdown-panel">
+        <div id="error-message"></div>
+    </div>
+</div>
 <script>
-    import { $authentication, signInWithGoogle, signOut } from "../store/authentication";
+    import { $authentication, signInWithGoogle, signInWithoutAccount, signOut } from "../store/authentication";
 
-    const button = document.getElementById('authentication');
+    const loadingGroup = document.getElementById('loading-group');
+    const anonymousGroup = document.getElementById('anonymous-group');
+    const authenticatedGroup = document.getElementById('authenticated-group');
+    const errorGroup = document.getElementById('error-group');
+    const errorMessage = document.getElementById('error-message');
+    const emailField = document.getElementById('user-email');
+
+    document.getElementById('sign-in-with-google')!.onclick = signInWithGoogle;
+    document.getElementById('sign-out')!.onclick = signOut;
+    
     $authentication.subscribe((auth) => {
-        switch (auth.status) {
+        switch (auth?.status) {
             case 'ANONYMOUS':
-                button!.innerHTML = '🫥';
-                button!.removeAttribute('disabled');
-                button!.setAttribute('title', `signed in anonymously as ${auth.uid}`);
-                button!.onclick = signInWithGoogle;
+                loadingGroup?.setAttribute('hidden', 'true');
+                authenticatedGroup?.setAttribute('hidden', 'true');
+                errorGroup?.setAttribute('hidden', 'true');
+                anonymousGroup?.removeAttribute('hidden');
                 break;
             case 'AUTHENTICATED':
-                button!.innerHTML = '😀';
-                button!.removeAttribute('disabled');
-                button!.setAttribute('title', `signed in as ${auth.uid}`);
-                button!.onclick = signOut;
+                emailField!.innerHTML = auth.email;
+                loadingGroup?.setAttribute('hidden', 'true');
+                anonymousGroup?.setAttribute('hidden', 'true');
+                errorGroup?.setAttribute('hidden', 'true');
+                authenticatedGroup?.removeAttribute('hidden');
                 break;
             case 'ERROR':
-                button!.innerHTML = '😵';
-                button!.removeAttribute('disabled');
-                button!.setAttribute('title', auth.errorMessage);
+                errorMessage!.innerHTML = auth.errorMessage
+                loadingGroup?.setAttribute('hidden', 'true');
+                anonymousGroup?.setAttribute('hidden', 'true');
+                authenticatedGroup?.setAttribute('hidden', 'true');
+                errorGroup?.removeAttribute('hidden');
                 break;
             default:
-                button!.innerHTML = '⏳';
-                button!.setAttribute('disabled', 'true');
-                button!.setAttribute('title', 'loading...');
+                anonymousGroup?.setAttribute('hidden', 'true');
+                authenticatedGroup?.setAttribute('hidden', 'true');
+                errorGroup?.setAttribute('hidden', 'true');
+                loadingGroup?.removeAttribute('hidden');
                 break;
         }
     });
 </script>
 <style>
-    button {
+    button.dropdown-trigger {
+        height: 2rem;
         background: none;
         border: none;
+        padding: .5rem;
+        border-radius: .5rem .5rem 0 0;
+        position: absolute;
+        top: 0;
+        right: 0;
         cursor: pointer;
-        margin: 0;
-        padding: 0;
+    }
+    .dropdown {
+        position: relative;
+        height: 2rem;
+        width: 2rem;
+    }
+    .dropdown-panel {
+        position: absolute;
+        right: 0;
+        top: 2.15rem;
+        padding: 1rem 2rem;
+        border-radius: 1rem 0rem 1rem 1rem;
+        background-color: hsl(var(--background));
+        color: inherit;
+        border: 1px solid hsl(var(--foreground));
+        z-index: 2;
+        visibility: hidden;
+        font-size: .75rem;
+        line-height: 1.25rem;
+    }
+    .dropdown:focus-within > button.dropdown-trigger  {
+        padding-bottom: 1.6rem;
+        background-color: hsl(var(--background));
+        border: 1px solid hsl(var(--foreground));
+        border-bottom: 1px solid hsl(var(--background));
+        z-index: 4;
+    }
+    .dropdown:focus-within > .dropdown-panel {
+        visibility: visible;
+    }
+    .auth-button {
+        margin: 1rem 0 0 0;
+        padding: 0.5rem 1rem;
+		color: hsl(var(--background));
+        background-color: hsl(var(--foreground));
+		border: solid 2px hsl(var(--foreground));
+		border-radius: 1.25rem;
+		cursor: pointer;
+		text-wrap: nowrap;
     }
 </style>
