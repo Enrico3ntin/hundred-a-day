@@ -1,26 +1,29 @@
 ---
 ---
-<div id="loading-group" class="dropdown">
-    <button class="dropdown-trigger" title="loading..." disabled>⏳</button>
-</div>
-<div id="anonymous-group" class="dropdown" hidden>
-    <button class="dropdown-trigger" title="anonymous user">🫥</button>
-    <div class="dropdown-panel">
-        <div>User authenticated anonymously</div>
-        <button class="auth-button" id="sign-in-with-google">Sign in with Google</button>
+<div>
+
+    <div id="loading-group" class="dropdown">
+        <button class="dropdown-trigger" title="loading..." disabled>⏳</button>
     </div>
-</div>
-<div id="authenticated-group" class="dropdown" hidden>
-    <button class="dropdown-trigger" title="authenticated user">😀</button>
-    <div class="dropdown-panel">
-        <div>Signed in as <span id="user-email"></span></div>
-        <button class="auth-button" id="sign-out">Sign out</button>
+    <div id="anonymous-group" class="dropdown" hidden>
+        <button class="dropdown-trigger" title="anonymous user">🫥</button>
+        <div class="dropdown-panel">
+            <div>User authenticated anonymously</div>
+            <button class="auth-button" id="sign-in-with-google">Sign in with Google</button>
+        </div>
     </div>
-</div>
-<div id="error-group" class="dropdown" hidden>
-    <button class="dropdown-trigger" title="error">😵</button>
-    <div class="dropdown-panel">
-        <div id="error-message"></div>
+    <div id="authenticated-group" class="dropdown" hidden>
+        <button class="dropdown-trigger" title="authenticated user">😀</button>
+        <div class="dropdown-panel">
+            <div>Signed in as <span id="user-email"></span></div>
+            <button class="auth-button" id="sign-out">Sign out</button>
+        </div>
+    </div>
+    <div id="error-group" class="dropdown" hidden>
+        <button class="dropdown-trigger" title="error">😵</button>
+        <div class="dropdown-panel">
+            <div id="error-message"></div>
+        </div>
     </div>
 </div>
 <script>
@@ -107,6 +110,7 @@
     }
     .dropdown:focus-within > .dropdown-panel {
         visibility: visible;
+        box-shadow: 0 5px 10px hsl(var(--foreground) / 50%);
     }
     .auth-button {
         margin: 1rem 0 0 0;

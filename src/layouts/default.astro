@@ -1,0 +1,89 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.svg" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#171735" />
+    <title>100 a day</title>
+  </head>
+  <body>
+    <header>
+        <slot name="header"/>
+    </header>
+    <main>
+        <slot/>
+    </main>
+    <footer>
+        <slot name="footer"/>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+	@import url('https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght,CRSV@300,0&family=Exo+2&display=swap');
+
+	:root {
+		--background: 240 39% 15%;
+		--foreground: 157 88% 76%;
+		--accent: 319 100% 63%;
+	}
+</style>
+<style>
+    :root {
+        --min-screen-width: 300px;
+        --max-screen-width: 512px;
+        --header-height: 6rem;
+        --footer-height: 6rem;
+    }
+    html, body {
+        box-sizing: border-box;
+        position: absolute;
+        padding: 0;
+        margin: 0; 
+        inset: 0;
+    }
+
+    html {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+
+        height: 100vvh;
+    
+        font-family: "Exo 2", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10px;
+        font-size: clamp(10px, 7.273vw - 13.273px, 18px);
+    }
+
+    body {
+        display: grid;
+        grid-template-columns: auto minmax(var(--min-screen-width), var(--max-screen-width)) auto;
+        grid-template-rows: var(--header-height) auto var(--footer-height);
+    }
+    body > * {
+        grid-column-start: 2;
+        grid-column-end: 3
+    }
+
+    header, main, footer {
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    header { 
+        justify-content: space-between;
+    }
+    main {
+        flex-direction: column;
+        justify-content: center;
+    }
+    footer {
+        justify-content: center;
+    }
+</style>

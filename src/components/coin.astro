@@ -1,0 +1,62 @@
+---
+import ProgressIndicator from "./progress-indicator.astro"
+---
+<div id="container">
+    <div id="coin">
+        <div id="front">
+            <ProgressIndicator column>
+                <slot name="front"/>
+            </ProgressIndicator>
+        </div>
+        <div id="back">
+            <ProgressIndicator>
+                <slot name="back"/>
+            </ProgressIndicator>
+        </div>
+    </div>
+</div>
+
+<style>
+    #container {
+        position: relative;
+        perspective: 1000px;
+    }
+    #coin {
+        width: 80vw;
+        height: 80vw;
+		max-width: 20rem;
+		max-height: 20rem;
+        position: relative;
+        transition: transform 600ms;
+        transform-style: preserve-3d;
+    }
+    #front, #back {
+        position: absolute;
+        inset: 0;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+    #back {
+        transform: rotateY(180deg);
+    }
+
+    #coin {
+        animation: bounce, flip;
+        animation-duration: 3s, 9s;
+        animation-iteration-count: infinite;
+    }
+    @keyframes bounce {
+        0% { translate: 0 0; }
+        50% { translate: 0 -2rem; }
+        100% { translate: 0 0; }
+    }
+    @keyframes flip {
+        0% { transform: rotateY(0); }
+        45% { transform: rotateY(0); }
+        50% { transform: rotateY(180deg); }
+        70% { transform: rotateY(180deg); }
+        75% { transform: rotateY(360deg); }
+        100% { transform: rotateY(360deg); }
+    }
+
+</style>

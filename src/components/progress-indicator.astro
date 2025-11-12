@@ -1,0 +1,64 @@
+---
+const { column } = Astro.props;
+---
+<div style={ column? 'flex-direction: column' : '' }>
+    <slot/>
+</div>
+
+<style>
+    :root {
+        --progress-gradient: conic-gradient(hsl(var(--foreground)), 0%, hsl(var(--foreground) / 10%), 0%, hsl(var(--foreground) / 10%));
+    }
+
+    div {
+        border-radius: 100%;
+        position: absolute;
+        inset: 0;
+        border: 1px solid hsl(var(--foreground));
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
+	div {
+		isolation: isolate;
+		box-sizing: border-box;
+		border: 3px solid transparent;
+		background: var(--progress-gradient) border-box;
+	}
+	div::before {
+		content: '';
+		position: absolute;
+		inset: -.5rem;
+		border-radius: 100%;
+		z-index: -2;
+		background: var(--progress-gradient);
+		filter: blur(1rem);
+	}
+	div::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 100%;
+		z-index: -1;
+        background-color: hsl(var(--background));
+	}
+</style>
+
+<script>
+	import { $countdown } from '../store/countdown.ts';
+
+    const timeForReps = document.getElementById("target")!;
+    const completed = document.getElementById("progress")!;
+    const todo = document.getElementById("todo")!;
+
+    $countdown.subscribe(({ percentage }) => {
+        if (percentage == undefined) return;
+        (document.querySelector(':root')! as HTMLElement).style
+            .setProperty('--progress-gradient', 
+                'conic-gradient(hsl(var(--foreground)), ' +
+                percentage + '%, hsl(var(--foreground) / 10%), ' +
+                percentage + '%, hsl(var(--foreground) / 10%))');
+    });
+</script>
