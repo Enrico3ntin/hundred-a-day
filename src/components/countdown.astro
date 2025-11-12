@@ -1,43 +1,53 @@
 ---
+import Coin from "./coin.astro";
 ---
-<div id="target">
-    <div class="pre-value">Time for</div>
-    <div class="value">?</div>
-    <div class="post-value">push-ups</div>
-</div>
-
-<div id="progress">
-    <div class="pre-value">??? push-ups to go</div>
-    <div class="value"><div></div></div>
-    <div class="post-value">??/???</div>
-</div>
+<Coin>
+	<Fragment slot="front">
+		<div id="challenge-complete">
+			<span>challenge</span>
+			<span id="challenge-complete-complete">complete!</span>
+			<span>🎉</span>
+		</div>
+		<div id="time-for">Time for</div>
+		<div id="target">? ?</div>
+		<div id="push-ups">push-ups</div>
+	</Fragment>
+	<Fragment slot="back">
+			<div id="progress-group">
+				<div id="progress">??</div>
+				<div id="push-ups-done">push-ups done</div>
+			</div>
+			<div id="todo-group">
+				<div id="todo">??</div>
+				<div id="push-ups-togo">to go</div>
+			</div>
+	</Fragment>
+</Coin>
 
 <script>
 	import { $countdown } from '../store/countdown.ts';
 
-    const timeForReps = document.querySelector("#target > .value")!;
-    const todo = document.querySelector("#progress > .pre-value")!;
-    const completed = document.querySelector("#progress > .post-value")!;
-    const progressBar = document.querySelector("#progress > .value > div")!;
+    const timeForReps = document.getElementById("target")!;
+    const completed = document.getElementById("progress")!;
+    const todo = document.getElementById("todo")!;
 
-    $countdown.subscribe(({ goal, repCount, target, remaining, percentage }) => {
+    $countdown.subscribe(({ repCount, target, remaining }) => {
 		if (target == undefined || repCount == undefined || remaining == undefined) return;
 		timeForReps.setHTMLUnsafe(`${target}`);
-		todo.setHTMLUnsafe((repCount < goal) ?
-			`${remaining} push-ups to go` :
-			`You did it! 🎉 ${repCount} push-ups today!`);
-        completed.setHTMLUnsafe(`${repCount}/${goal}`);
-        progressBar.setAttribute('style', `width:${percentage}%`);
+		todo.setHTMLUnsafe(`${remaining}`);
+		completed.setHTMLUnsafe(`${repCount}`);
+		if (remaining == 0) {
+			document
+			.getElementById('todo-group')
+			?.setAttribute('style', 'display: none');
+			document.getElementById('challenge-complete')
+			?.setAttribute('style', 'display: flex')
+		}
     });
 </script>
 
 <style>
-    svg {
-        display: block;
-        width: 100%;
-        height: auto;
-    }
-    #target > .value {
+    #target, #progress, #todo, #challenge-complete-complete {
 		font-family: "Bitcount Prop Single", system-ui;
 		font-optical-sizing: auto;
 		font-weight: 300;
@@ -47,44 +57,60 @@
 			"CRSV" 0,
 			"ELSH" 0,
 			"ELXP" 0;
+		text-align: center;
 	}
-
 	#target {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		text-align: center;
-	}
-
-	#target > .value {
-		height: 8rem;
-		color: hsl(var(--accent));
 		font-size: 12rem;
-		line-height: 9.5rem;
-		padding-left: 2.5rem;
-		text-align: center;
+		line-height: 5.5rem;
+		letter-spacing: -2rem;
+		padding: 1.5rem 0 0 1.25rem;
+		color: hsl(var(--accent));
+		text-shadow: 0 5px 10px hsl(var(--accent) / 50%);
+	}
+	#progress, #todo {
+		font-size: 6rem;
+		line-height: 2rem;
 		letter-spacing: -1rem;
+		padding: 1.2rem 0 .5rem 0;
+		text-shadow: 0 5px 10px hsl(var(--foreground) / 50%);
 	}
 
-	#progress {
-		width: 100%;
+	#push-up-done, #push-up-togo {
+		text-align: center;
+	}
+
+	#progress-group,
+	#todo-group {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+		position: relative;
 		gap: 1rem;
+		margin-top: .5rem;
+	}
+	#todo-group::before {
+		content: '';
+		position: absolute;
+		inset: 0 auto 0 0;
+		width: 1px;
+		border-left: 1px solid hsl(var(--foreground));
+		margin-left: -1rem;
+		box-shadow: 0 0 10px hsl(var(--foreground) / 70%);
 	}
 
-	#progress > .value {
-		height: .5rem;
-		width: 100%;
-		background: hsl(var(--foreground) / .15);
-		border: solid 1px hsl(var(--foreground) / .25);
-		border-radius: .25rem;
+	#challenge-complete {
+		position: absolute;
+		inset: 0;
+		background-color: hsl(var(--background));
+		border-radius: 100%;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		display: none;
 	}
-
-	#progress > .value > div {
-		height: 100%;
-		width: 0%; 
-		background-color: hsl(var(--foreground));
+	#challenge-complete-complete {
+		color: hsl(var(--accent));
+		font-size: 3.25rem;
 	}
 </style>

@@ -1,75 +1,34 @@
 ---
+import DefaultLayout from '../layouts/default.astro';
 import Header from "../components/header.astro";
 import Countdown from "../components/countdown.astro";
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>100 a Day</title>
-	</head>
-	<body>
-		<Header />
-		<Countdown />
-
-		<form id="logRepsForm">
+<DefaultLayout>
+    <Header slot="header"/>
+    <Countdown/>
+    <Fragment slot="footer">
+        <form id="logRepsForm">
 			<input id="logRepsField" type="number" />
 			<input type="submit" value="Log" />
 		</form>
+    </Fragment>
+</DefaultLayout>
 
-		<script>
-			import { logSession } from '../store/countdown';
-			const logRepsField = document.getElementById('logRepsField') as HTMLInputElement;
-			const logRepsForm = document.getElementById('logRepsForm');
-			logRepsForm!.onsubmit = (event) => {
-				event.preventDefault();
-				const value = logRepsField.value;
-				if (value) {
-					logSession(parseInt(value));
-					logRepsField.value = '';
-				}
-			}
-		</script>
-	</body>
-</html>
+<script>
+    import { logSession } from '../store/countdown';
+    const logRepsField = document.getElementById('logRepsField') as HTMLInputElement;
+    const logRepsForm = document.getElementById('logRepsForm');
+    logRepsForm!.onsubmit = (event) => {
+        event.preventDefault();
+        const value = logRepsField.value;
+        if (value) {
+            logSession(parseInt(value));
+            logRepsField.value = '';
+        }
+    }
+</script>
 
-<style is:global>
-	@import url('https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght,CRSV@300,0&family=Exo+2&display=swap');
-
-	:root {
-		--background: 240 39% 15%;
-		--foreground: 157 88% 76%;
-		--accent: 319 100% 63%;
-	}
-
-	html {
-		font-family: "Exo 2", sans-serif;
-		font-optical-sizing: auto;
-		font-weight: 400;
-		font-style: normal;
-		font-size: 10px;
-		font-size: clamp(10px, 7.273vw - 13.273px, 18px);
-		background-color: hsl(var(--background));
-		color: hsl(var(--foreground));
-		height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
-
-	body {
-		margin: 0 auto;
-		padding: 1rem 2rem;
-		max-width: 40ch;
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: space-between;
-	}
-
+<style>
 	form {
 		width: 100%;
 		display: flex;
@@ -85,19 +44,34 @@ import Countdown from "../components/countdown.astro";
 		border-radius: 1.25rem;
 		cursor: pointer;
 	}
-
+	
 	input[type="submit"] {
 		background-color: hsl(var(--foreground));
 		color: hsl(var(--background));
 		border: solid 2px hsl(var(--foreground));
 		flex: 1;
+		box-shadow: 0 0 1rem hsl(var(--foreground) / 50%);
+		transition: box-shadow 50ms linear;
 	}
+	input[type="submit"]:hover {
+		box-shadow: 0 .05rem 1.5rem hsl(var(--foreground) / 50%);
+	}
+	input[type="submit"]:active {
+		background-color: hsl(var(--foreground) / 90%);
+		border: solid 2px hsl(var(--foreground) / 70%);
+		box-shadow: 0 0 .5rem hsl(var(--foreground) / 50%);
+	}
+
+
 
 	input[type="number"] {
 		background-color: hsl(var(--background));
 		color: hsl(var(--foreground));
-		border: solid 2px hsl(var(--foreground));
+		border: solid 1px hsl(var(--foreground));
 		flex: auto;
 	}
-
+	input[type="number"]:focus {
+		outline: none;
+		box-shadow: 0 0 1rem hsl(var(--foreground) / 50%);
+	}
 </style>
