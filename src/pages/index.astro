@@ -15,7 +15,10 @@ import Countdown from "../components/countdown.astro";
 </DefaultLayout>
 
 <script>
-    import { logSession } from '../store/countdown';
+    import { logAnalyticsEvent } from '../store/analytics';
+	import { logSession } from '../store/countdown';
+
+	logAnalyticsEvent("NAVIGATION");
     const logRepsField = document.getElementById('logRepsField') as HTMLInputElement;
     const logRepsForm = document.getElementById('logRepsForm');
     logRepsForm!.onsubmit = (event) => {

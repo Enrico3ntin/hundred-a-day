@@ -2,6 +2,7 @@ import { GoogleAuthProvider, type Auth } from "firebase/auth";
 import { atom, onMount, task } from "nanostores";
 import { getAuth, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { $firebaseApp } from "./firebase";
+import { logAnalyticsEvent } from "./analytics";
 
 type Authentication = 
     { status: 'NONE' | 'LOADING' } |
@@ -34,18 +35,21 @@ const signInWithoutAccount = () => {
     $authentication.set({ status: 'LOADING' });
     signInAnonymously($firebaseAuth.get()!)
     .catch(error => $authentication.set({ status: 'ERROR',  errorMessage: `${error}` } ));
+    logAnalyticsEvent("ANONYMOUS_SIGN_IN");
 };
 
 const signInWithGoogle = () => { 
     $authentication.set({ status: 'LOADING' });
     signInWithPopup($firebaseAuth.get()!, $googleAuthProvider.get()!)
     .catch( error => $authentication.set({ status: 'ERROR', errorMessage: `${error}` } ));
+    logAnalyticsEvent("AUTHENTICATED_SIGN_IN");
 };
 
 const signOutOfAccount = () => { 
     $authentication.set({ status: 'LOADING' });
     signOut($firebaseAuth.get()!)
     .catch( error => $authentication.set({ status: 'ERROR', errorMessage: `${error}` } ));
+    logAnalyticsEvent("AUTHENTICATED_SIGN_OUT");
 };
 
 export { 
