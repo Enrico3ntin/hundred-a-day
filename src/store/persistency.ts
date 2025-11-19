@@ -2,6 +2,7 @@ import { Database, getDatabase, ref, push, onValue, DataSnapshot, type Unsubscri
 import { $firebaseApp } from "./firebase";
 import { atom, onMount, computed, onSet, effect } from "nanostores";
 import { $authentication } from "./authentication";
+import { logAnalyticsEvent } from "./analytics";
 
 const DATABASE_URL = "https://hundredaday-3nsn-default-rtdb.europe-west1.firebasedatabase.app";
 
@@ -54,6 +55,7 @@ const persistSession : (timestamp:Date, repCount:number)=>void =
         const reference = $databaseRef.get();
         const session = { timestamp:timestamp.getTime(), repCount:repCount };
         if (reference) push(reference, session);
+        logAnalyticsEvent("SESSION_LOG");
     };
 
 export { subscribe, persistSession};
